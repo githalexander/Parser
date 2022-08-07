@@ -1,12 +1,10 @@
-﻿// Parser.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
-
 #include <iostream>
 #include <AclAPI.h>// This is libclang.
 #include <inttypes.h>
 #include <clang-c/Index.h>
 #include <iostream>
 #include <clang-c/Index.h>
+
 
 using namespace std;
 
@@ -36,9 +34,11 @@ void recursive(CXCursor cursor) {
 int main()
 {
     CXIndex index = clang_createIndex(0, 0);
+    //const char* const*;
+    const char* command_line_args[] = { "-x", "c++", 0 };
     CXTranslationUnit unit = clang_parseTranslationUnit(
         index,
-        "header.h", nullptr, 0,
+        "header.h", command_line_args, (sizeof command_line_args / sizeof * command_line_args) - 1,
         nullptr, 0,
         CXTranslationUnit_None);
     if (unit == nullptr)
@@ -56,12 +56,28 @@ int main()
         {
             cout << "Cursor '" << clang_getCursorSpelling(c) << "' of kind '"
                 << clang_getCursorKindSpelling(clang_getCursorKind(c)) << "'\n";
+
+            if (c.kind == CXCursor_Namespace) {
+                std::cout << "+++++++++++00000000000000000000009999999999999900\n";
+            }
+
+            if (c.kind == CXCursor_EnumConstantDecl) {
+                CXString spelling = clang_getCursorSpelling(c);
+                int t=clang_getEnumConstantDeclValue(c);
+                std::cout <<t<<"+++++++++++++++++++++++++++++++!!!!!!\n";
+                //return CXChildVisit_Continue;
+
+
+                
+                //myMap[clang_getCString(spelling)] = clang_getEnumConstantDeclValue(c);
+                
+
+                clang_disposeString(spelling);
+            }
             return CXChildVisit_Recurse;
+    
         },
         & ret);
-
-    
-
 
     clang_disposeTranslationUnit(unit);
     clang_disposeIndex(index);
